@@ -119,9 +119,11 @@ class BedrockProxy {
    * @param {string} host - The destination Bedrock server IP.
    * @param {number} port - The destination Bedrock server Port.
    * @param {number} listenPort - The local port this proxy will listen on.
+   * @param {string} version - The Minecraft Bedrock version string to target.
+   * @param {string} transport - The network transport protocol to force ('raknet' or 'nethernet').
    * @param {PacketLogger} logger - The logger instance used to record packets.
    */
-  constructor(host, port, listenPort, logger) {
+  constructor(host, port, listenPort, version, transport, logger) {
     /**
      * The destination Bedrock server IP.
      * @type {string}
@@ -141,6 +143,18 @@ class BedrockProxy {
     this.listenPort = listenPort;
 
     /**
+     * The Minecraft Bedrock protocol version to spoof/target.
+     * @type {string}
+     */
+    this.version = version;
+
+    /**
+     * The network transport protocol to force.
+     * @type {string}
+     */
+    this.transport = transport;
+
+    /**
      * The logger instance used to record packets.
      * @type {PacketLogger}
      */
@@ -158,14 +172,19 @@ class BedrockProxy {
    */
   start() {
     console.log(`Starting proxy... listening on 0.0.0.0:${this.listenPort}`);
+    console.log(`Targeting Bedrock Version: ${this.version}`);
+    console.log(`Forcing Transport Protocol: ${this.transport}`);
     console.log(`Forwarding to ${this.host}:${this.port}`);
 
     this.relay = new Relay({
       host: '0.0.0.0',
       port: this.listenPort,
+      version: this.version,
+      transport: this.transport,
       destination: {
         host: this.host,
-        port: this.port
+        port: this.port,
+        transport: this.transport
       }
     });
 
@@ -193,6 +212,8 @@ const DB_FILE = process.env.DB_FILE || 'packets.db';
 const TARGET_HOST = process.env.TARGET_HOST;
 const TARGET_PORT = parseInt(process.env.TARGET_PORT, 10) || 19132;
 const PROXY_PORT = parseInt(process.env.PROXY_PORT, 10) || 19131;
+const BEDROCK_VERSION = process.env.BEDROCK_VERSION || '1.26.52';
+const BEDROCK_TRANSPORT = process.env.BEDROCK_TRANSPORT || 'raknet';
 
 if (!TARGET_HOST) {
   console.error('Fatal: TARGET_HOST is not defined in the .env file. Fix your shit and try again.');
@@ -200,7 +221,7 @@ if (!TARGET_HOST) {
 }
 
 const dbLogger = new PacketLogger(DB_FILE);
-const proxy = new BedrockProxy(TARGET_HOST, TARGET_PORT, PROXY_PORT, dbLogger);
+const proxy = new BedrockProxy(TARGET_HOST, TARGET_PORT, PROXY_PORT, BEDROCK_VERSION, BEDROCK_TRANSPORT, dbLogger);
 
 proxy.start();
 
