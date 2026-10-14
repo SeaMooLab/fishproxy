@@ -1,0 +1,21 @@
+{
+  "name": "fishproxy",
+  "version": "1.0.0",
+  "description": "MITM proxy for logging Bedrock packets to SQLite",
+  "main": "src/proxy.js",
+  "scripts": {
+    "start": "node src/proxy.js",
+    "zip": "bestzip fishproxy.zip src/ package.json package-lock.json .env.example README.md"
+  },
+  "keywords": [],
+  "author": "DJ Stomp <85457381+DJStompZone@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bedrock-protocol": "^3.59.0",
+    "better-sqlite3": "^13.0.3",
+    "dotenv": "^18.0.7"
+  },
+  "devDependencies": {
+    "bestzip": "^4.0.3"
+  }
+}
